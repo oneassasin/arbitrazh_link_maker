@@ -41,8 +41,8 @@
 ##### Регистрация случайного домена на jino, выгрузка white page и black page на этот домен
 ```npm start -- --black_page_path=ПУТЬ_К_ZIP_АРХИВУ --white_page_path=ПУТЬ_К_ZIP_АРХИВУ```
 
-##### Регистрация случайного домена в зоне `.com` на jino, генерация white page на https://pl.ad-red.ru/, black page с zip архива на компьютере 
-```npm start -- --black_page_path=ПУТЬ_К_ZIP_АРХИВУ```
+##### Регистрация случайного домена в зоне `.com` на jino, генерация white page на https://pl.ad-red.ru/ c тематикой #5 и языком #3, black page с zip архива на компьютере 
+```npm start -- --black_page_path=ПУТЬ_К_ZIP_АРХИВУ --language=3 --thematic=5```
 
 ##### Регистрация случайного домена в зоне `.com` на beget, генерация white page на https://pl.ad-red.ru/, black page с zip архива на компьютере
 ```npm start -- --black_page_path=ПУТЬ_К_ZIP_АРХИВУ --hosting=beget```
