@@ -20,7 +20,7 @@ export class StorageUtil {
         cloak: { choices: ['hideclick'], default: 'hideclick' },
 
         black_page_path: { type: 'string', demandOption: true, coerce: str => path.resolve(str) },
-        white_page_path: { type: 'string', demandOption: true, coerce: str => path.resolve(str) }
+        white_page_path: { type: 'string', demandOption: false, coerce: str => path.resolve(str) }
       })
       .argv;
 
