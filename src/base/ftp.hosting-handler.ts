@@ -1,86 +1,107 @@
 import { BaseHostingHandler } from './base.hosting-handler';
-import { STORAGE_KEYS } from '../constants/storage-keys.constants';
-import { AccessOptions, Client, FileInfo } from 'basic-ftp';
 import { FtpUtil } from '../utils/ftp.util';
 import { Readable } from 'stream';
 import { EFileItemType, FileItemStructure } from '../structures/file-item.structure';
 import * as AdmZip from 'adm-zip';
+import Client, { ConnectOptions, FileInfo } from 'ssh2-sftp-client';
 
 export abstract class FtpHostingHandler extends BaseHostingHandler {
   protected ftpClient: Client;
 
   async init() {
-    const accessOptions = this.getFtpAccessOptions();
-    const ftpHost = accessOptions.host;
-
-    this.ftpClient = await FtpUtil.makeNewInstance(accessOptions);
-
-    let ftpObject = await this.storage.get(STORAGE_KEYS.FTP_KEY);
-    if (!ftpObject) {
-      ftpObject = {};
-    }
-
-    ftpObject[ftpHost] = this.ftpClient;
-    await this.storage.set(STORAGE_KEYS.FTP_KEY, ftpObject);
-
-    if (this.isNeedToClearDomainFolder()) {
-      await this.ftpClient.ensureDir(this.formatDestinationPathForDomain());
-
-      let filesList: FileInfo[] = await this.ftpClient.list();
-      while (filesList.length !== 0) {
-        try {
-          await this.ftpClient.clearWorkingDir()
-          filesList = await this.ftpClient.list();
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    }
-
-    await this.onInit();
   }
 
   async uploadFile(destinationUrl: string, fileItemStructure: FileItemStructure) {
-    let readable: Readable | string;
+    if (!this.ftpClient) {
+      await this.ftpInit();
+    }
+
+    let readable: Readable | string | Buffer;
 
     switch (fileItemStructure.type) {
       case EFileItemType.Zip: {
         const zipArchive = fileItemStructure.value as AdmZip;
 
-        for (const entry of zipArchive.getEntries()) {
+        const entries = zipArchive.getEntries();
+
+        for (const entry of entries) {
           if (entry.isDirectory) {
-            await this.ftpClient.ensureDir(`${destinationUrl}/${entry.entryName}`);
-            await this.ftpClient.cd('..');
+            await this.ftpClient.mkdir(`${destinationUrl}/${entry.entryName}`);
 
             continue;
           }
 
-          const data: Buffer = await new Promise<Buffer>(resolve => entry.getDataAsync(resolve));
-          readable = Readable.from(data.toString());
-          await this.ftpClient.uploadFrom(readable, `${destinationUrl}/${entry.entryName}`);
+          let remoteFilePath = destinationUrl;
+
+          if (entry.entryName.split('/').length > 1) {
+            const foldersArray = entry.entryName.split('/');
+
+            for (let index = 0; index < foldersArray.length; ++index) {
+              remoteFilePath += `/${foldersArray[index]}`;
+
+              if (index + 1 === foldersArray.length) {
+                break;
+              }
+
+              const isFolderExists = await this.ftpClient.exists(remoteFilePath);
+              if (isFolderExists) {
+                continue;
+              }
+
+              await this.ftpClient.mkdir(remoteFilePath);
+            }
+          } else {
+            remoteFilePath += `/${entry.entryName}`;
+          }
+
+          readable = await new Promise<Buffer>(resolve => entry.getDataAsync(resolve));
+
+          await this.ftpClient.put(
+            readable,
+            remoteFilePath,
+          );
         }
 
         return;
       }
       case EFileItemType.Buffer: {
-        readable = Readable.from(fileItemStructure.value.toString());
+        readable = Buffer.from(fileItemStructure.value);
         break;
       }
       case EFileItemType.String: {
-        readable = fileItemStructure.value as string;
+        readable = Buffer.from(fileItemStructure.value);
         break;
       }
     }
 
-    await this.ftpClient.uploadFrom(readable, `${destinationUrl}/${fileItemStructure.name}`);
+    await this.ftpClient.put(readable, `${destinationUrl}/${fileItemStructure.name}`);
   }
 
-  protected async onInit() {
+  private async ftpInit() {
+    const accessOptions = await this.getFtpAccessOptions();
+
+    this.ftpClient = await FtpUtil.makeNewInstance(this.storage, accessOptions);
+
+    if (this.isNeedToClearDomainFolder()) {
+      const filesList: FileInfo[] = await this.ftpClient.list(this.formatDestinationPathForDomain());
+      for (const file of filesList) {
+        try {
+          await this.ftpClient.rmdir(`${this.formatDestinationPathForDomain()}/${file.name}`, true);
+        } catch {
+        }
+        try {
+          await this.ftpClient.delete(`${this.formatDestinationPathForDomain()}/${file.name}`);
+        } catch {
+        }
+      }
+    }
+
+    await this.ftpClient.mkdir(`${this.formatDestinationPathForDomain()}/__page__`);
   }
 
   protected isNeedToClearDomainFolder(): boolean {
     return true;
   }
 
-  protected abstract getFtpAccessOptions(): AccessOptions;
+  protected abstract async getFtpAccessOptions(): Promise<ConnectOptions>;
 }

@@ -8,7 +8,7 @@ export abstract class BaseHostingHandler extends BaseInitiallyObject {
 
   abstract async uploadFile(destinationUrl: string, fileItemStructure: FileItemStructure);
 
-  abstract async registerDomain();
+  abstract async getDnsServers(): Promise<string[]>;
 
   abstract formatDestinationPathForDomain(): string;
 }

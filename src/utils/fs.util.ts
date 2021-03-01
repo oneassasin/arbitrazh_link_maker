@@ -33,9 +33,11 @@ export class FsUtil {
     return buffer.toString('utf8');
   }
 
-  static async saveFileToPath(filePath: string, data: string) {
+  static async saveBufferToPath(filePath: string, data: Buffer) {
+    await this.createFolder(path.join(filePath, '..'));
+
     return new Promise((resolve, reject) => {
-      fs.writeFile(filePath, data, {flag: 'w+'}, err => {
+      fs.writeFile(filePath, data, err => {
         if (err) {
           return reject(err);
         }
@@ -45,7 +47,28 @@ export class FsUtil {
     });
   }
 
-  static async createFolder(folderPath: string) {
+  static async saveFileToPath(filePath: string, data: string) {
+    await this.createFolder(path.join(filePath, '..'));
+
+    return new Promise((resolve, reject) => {
+      fs.writeFile(filePath, data, err => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve();
+      });
+    });
+  }
+
+  static async createFolder(dir: string) {
+    if (!fs.existsSync(dir)) {
+      await this.createFolder(path.join(dir, '..'));
+      await this.createDirAsync(dir);
+    }
+  }
+
+  private static async createDirAsync(folderPath: string) {
     return new Promise((resolve, reject) => {
       fs.mkdir(folderPath, {}, err => {
         if (err) {

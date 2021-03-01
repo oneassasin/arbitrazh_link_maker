@@ -5,9 +5,12 @@ import { STORAGE_KEYS } from './constants/storage-keys.constants';
 import { StorageUtil } from './utils/storage.util';
 import { FsStepExecutionReporter } from './step-execution-reports/fs.step-execution-reporter';
 import { ActionsGenerateUtil } from './utils/actions-generate.util';
+import { DomainRegisterFactory } from './domain-registers/domain-register.factory';
 
 async function main() {
   const storage = StorageUtil.parseArgsToStorage();
+
+  const domainRegister = DomainRegisterFactory.getDomainRegister(storage);
 
   const hostingHandler = HostingHandlerFactory.getHostingHandler(storage);
 
@@ -19,6 +22,7 @@ async function main() {
     storage,
     actions,
     new FsStepExecutionReporter(storage),
+    domainRegister,
     hostingHandler,
     [
       { fileName: 'black.zip' },

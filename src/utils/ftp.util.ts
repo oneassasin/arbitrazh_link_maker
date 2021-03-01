@@ -1,10 +1,22 @@
-import { AccessOptions, Client } from 'basic-ftp';
+import { STORAGE_KEYS } from '../constants/storage-keys.constants';
+import { ConnectOptions } from 'ssh2-sftp-client';
+import * as Client from 'ssh2-sftp-client';
 
 export class FtpUtil {
-  static async makeNewInstance(accessOptions: AccessOptions): Promise<Client> {
+  static async makeNewInstance(storage: Map<string, any>, accessOptions: ConnectOptions): Promise<Client> {
     const client = new Client();
 
-    await client.access(accessOptions);
+    accessOptions.retries = 5000;
+
+    await client.connect(accessOptions);
+
+    let ftpObject = storage.get(STORAGE_KEYS.FTP_KEY);
+    if (!ftpObject) {
+      ftpObject = {};
+    }
+
+    ftpObject[accessOptions.host] = { client };
+    storage.set(STORAGE_KEYS.FTP_KEY, ftpObject);
 
     return client;
   }

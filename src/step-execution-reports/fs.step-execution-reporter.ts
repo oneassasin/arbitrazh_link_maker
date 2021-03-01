@@ -26,12 +26,12 @@ export class FsStepExecutionReporter extends BaseStepExecutionReporter {
     }
 
     const buffer = await FsUtil.readFileFromPath(`${FOLDER_NAME}/${domain}/${key}`);
-    return buffer.toString('utf-8');
+    return buffer.toString('utf-8').replace('\n', '');
   }
 
-  protected async saveItem(domain: string, data: string) {
+  protected async saveItem(domain: string, key: string, data: string) {
     await this.checkExistOfSubDir(domain);
-    await FsUtil.saveFileToPath(`${FOLDER_NAME}/${domain}/${data}`, '1');
+    await FsUtil.saveFileToPath(`${FOLDER_NAME}/${domain}/${key}`, data);
   }
 
   async clearData() {

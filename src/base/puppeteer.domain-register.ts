@@ -1,11 +1,15 @@
 import { STORAGE_KEYS } from '../constants/storage-keys.constants';
-import { PuppeteerUtil } from '../utils/puppeteer.util';
 import { Browser, Page } from 'puppeteer';
-import { FileAction } from './file.action';
+import { PuppeteerUtil } from '../utils/puppeteer.util';
+import { BaseDomainRegister } from './base.domain-register';
 
-export abstract class PuppeteerAction extends FileAction {
+export abstract class PuppeteerDomainRegister extends BaseDomainRegister {
   protected browser: Browser;
   protected page: Page;
+
+  constructor(protected storage: Map<string, any>) {
+    super();
+  }
 
   async init() {
     const domain = this.storage.get(STORAGE_KEYS.DOMAIN_KEY);
@@ -16,8 +20,6 @@ export abstract class PuppeteerAction extends FileAction {
 
     this.browser = browser;
     this.page = page;
-
-    await super.init();
   }
 
   protected abstract getUrl(): string;

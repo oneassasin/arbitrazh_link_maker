@@ -10,11 +10,11 @@ export abstract class BaseStepExecutionReporter extends BaseInitiallyObject {
   }
 
   async saveStep(step: string) {
-    await this.saveItem(this.storage.get(STORAGE_KEYS.DOMAIN_KEY), step);
+    await this.saveItem(this.storage.get(STORAGE_KEYS.DOMAIN_KEY), step, '0');
   }
 
   async completeStep(step: string) {
-    await this.saveItem(this.storage.get(STORAGE_KEYS.DOMAIN_KEY), step);
+    await this.saveItem(this.storage.get(STORAGE_KEYS.DOMAIN_KEY), step, '1');
   }
 
   async isStepCompleted(step: string): Promise<boolean> {
@@ -25,7 +25,7 @@ export abstract class BaseStepExecutionReporter extends BaseInitiallyObject {
 
   abstract async clearData();
 
-  protected abstract async saveItem(domain: string, data: string);
+  protected abstract async saveItem(domain: string, key: string, data: string);
 
   protected abstract async readItem(domain: string, key: string): Promise<string>;
 }

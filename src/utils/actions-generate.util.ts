@@ -1,9 +1,9 @@
 import { STORAGE_KEYS } from '../constants/storage-keys.constants';
-import { BaseAction } from '../base/base.action';
 import { ReadBlackPageAction } from '../actions/read-black-page.action';
 import { ReadWhitePageAction } from '../actions/read-white-page.action';
 import { GenerateHideClickPhpFileAction } from '../actions/generate-hide-click-php-file.action';
 import { GenerateWhitePageAction } from '../actions/generate-white-page.action';
+import { BaseAction } from '../base/base.action';
 
 export class ActionsGenerateUtil {
   static generateActionsFromStorage(storage: Map<string, any>): BaseAction[] {

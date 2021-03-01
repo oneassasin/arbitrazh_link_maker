@@ -9,8 +9,12 @@ interface IConfig {
   BEGET_USER: string;
   BEGET_PASSWORD: string;
 
-  AD_RED_RU_USER: string;
-  AD_RED_RU_PASSWORD: string;
+  NAMECHEAP_USER: string;
+  NAMECHEAP_PASSWORD: string;
+
+  AD_RED_RU_TOKEN: string;
+
+  DIGITALOCEAN_TOKEN: string;
 
   HIDE_CLICK_TOKEN: string;
 
@@ -27,8 +31,12 @@ const config = {
     BEGET_USER: '',
     BEGET_PASSWORD: '',
 
-    AD_RED_RU_USER: '',
-    AD_RED_RU_PASSWORD: '',
+    AD_RED_RU_TOKEN: '',
+
+    NAMECHEAP_USER: '',
+    NAMECHEAP_PASSWORD: '',
+
+    DIGITALOCEAN_TOKEN: '',
 
     HIDE_CLICK_TOKEN: '',
   },

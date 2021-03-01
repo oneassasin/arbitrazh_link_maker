@@ -5,10 +5,6 @@ import * as AdmZip from 'adm-zip';
 
 export abstract class FileAction extends BaseAction {
   async init() {
-    await this.onInit();
-  }
-
-  protected async onInit() {
   }
 
   protected saveFile(name: string, buffer: Buffer, destination: string = 'files') {

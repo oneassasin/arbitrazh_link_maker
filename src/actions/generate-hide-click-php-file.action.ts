@@ -1,38 +1,60 @@
-import { PuppeteerAction } from '../base/puppeteer.action';
 import { URLS } from '../constants/urls.constants';
 import config from '../config';
 import { STORAGE_KEYS } from '../constants/storage-keys.constants';
 import { FsUtil } from '../utils/fs.util';
 import { PuppeteerUtil } from '../utils/puppeteer.util';
+import { HttpAction } from '../base/http.action';
+import { Cookie } from 'tough-cookie';
+import FormData = require('form-data');
 
-export class GenerateHideClickPhpFileAction extends PuppeteerAction {
+export class GenerateHideClickPhpFileAction extends HttpAction {
   protected getUrl(): string {
     return URLS.HIDE_CLICK_URL;
+  }
+
+  async init() {
+    await super.init();
+    const cookie = new Cookie({
+      key: 'api',
+      value: config.HIDE_CLICK_TOKEN,
+    });
+    await this.cookieJar.setCookie(cookie, URLS.HIDE_CLICK_URL);
   }
 
   async doAction() {
     const domain: string = await this.storage.get(STORAGE_KEYS.DOMAIN_KEY);
 
-    await this.page.type('#form0', config.HIDE_CLICK_TOKEN);
+    const bodyFormData = new FormData();
+    bodyFormData.append('WHITE_PAGE', `https://${domain}/index.html`);
+    bodyFormData.append('OFFER_PAGE', `https://${domain}/__page__`);
+    bodyFormData.append('ALLOW_GEO', 'UA');
+    bodyFormData.append('BLOCK_GEO', '');
+    bodyFormData.append('UTM', 'on');
+    bodyFormData.append('allow_utm_must', '');
+    bodyFormData.append('allow_utm_opt', '');
+    bodyFormData.append('block_utm', '');
+    bodyFormData.append('WHITE_METHOD', 'curl');
+    bodyFormData.append('OFFER_METHOD', 'iframe');
+    bodyFormData.append('WHITE_REF', '');
+    bodyFormData.append('BLOCK_APPLE', 'on');
+    bodyFormData.append('BLOCK_ANDROID', 'on');
+    bodyFormData.append('BLOCK_WIN', 'on');
+    bodyFormData.append('BLOCK_MOBILE', 'on');
+    bodyFormData.append('BLOCK_DESCTOP', 'on');
+    bodyFormData.append('DELAY_START', '0');
+    bodyFormData.append('act', 'download');
 
-    await this.page.type('#form1', `https://${domain}/index.html`);
+    const response = await this.httpClient.post(
+      'download.php',
+      bodyFormData,
+      {
+        headers: bodyFormData.getHeaders(),
+        withCredentials: true,
+      },
+    );
 
-    await this.page.type('#form2', `https://${domain}/__page__/index.html`);
-
-    await this.page.type('#form3', 'UA');
-
-    await new Promise(async resolve => {
-      this.page.on('response', response => {
-        const url = response.request().url();
-        const method = response.request().method();
-
-        if (url === 'https://hide.click/download.php' && method === 'POST') {
-          resolve();
-        }
-      });
-
-      await this.page.click('#download');
-    });
+    const basePath = PuppeteerUtil.getLinkToDownloadsFolder(domain, this.getUrl());
+    await FsUtil.saveBufferToPath(`${basePath}/index.php`, response.data);
   }
 
   async doPersistAction() {

@@ -1,12 +1,13 @@
 import { STORAGE_KEYS } from './constants/storage-keys.constants';
 import { FileItemStructure } from './structures/file-item.structure';
-import { BaseAction } from './base/base.action';
-import { BaseHostingHandler } from './base/base.hosting-handler';
 import { BaseInitiallyObject } from './base/base.initially-object';
 import * as path from 'path';
 import { Browser, Page } from 'puppeteer';
 import { BaseStepExecutionReporter } from './base/base.step-execution-reporter';
 import { FsUtil } from './utils/fs.util';
+import { BaseAction } from './base/base.action';
+import { BaseDomainRegister } from './base/base.domain-register';
+import { BaseHostingHandler } from './base/base.hosting-handler';
 
 const REGISTER_DOMAIN_STEP_NAME = 'register_domain';
 const DEFAULT_FILES_KEY = 'files';
@@ -15,6 +16,7 @@ export class Executor extends BaseInitiallyObject {
   constructor(private storage: Map<string, any>,
               private actions: BaseAction[],
               private stepExecutionReporter: BaseStepExecutionReporter,
+              private domainRegister: BaseDomainRegister,
               private hostingHandler: BaseHostingHandler,
               private uploadFiles: { url?: string; optionalUrl?: boolean, fileName: string, }[],
               private afterCompleteActions: BaseAction[] = []) {
@@ -30,6 +32,8 @@ export class Executor extends BaseInitiallyObject {
       await this.handleAction(action);
     }
 
+    await this.domainRegister.init();
+
     await this.hostingHandler.init();
 
     const isNeedToRegisterDomain = this.storage.get(STORAGE_KEYS.IS_NEED_TO_REGISTER_DOMAIN_KEY);
@@ -37,7 +41,15 @@ export class Executor extends BaseInitiallyObject {
       await this.stepExecutionReporter.isStepCompleted(REGISTER_DOMAIN_STEP_NAME);
 
     if (isNeedToRegisterDomain && !isNeedToRegisterDomainStepComplete) {
-      await this.hostingHandler.registerDomain();
+      await this.domainRegister.registerDomain();
+
+      const domainRegisterName = this.storage.get(STORAGE_KEYS.DOMAIN_REGISTER);
+      const hostingHandlerName = this.storage.get(STORAGE_KEYS.HOSTING_KEY);
+
+      if (domainRegisterName !== hostingHandlerName) {
+        const dnsServers = await this.hostingHandler.getDnsServers();
+        await this.domainRegister.setupDnsServers(dnsServers);
+      }
     }
 
     const filesObject = this.storage.get(STORAGE_KEYS.FILES_KEY);
@@ -83,11 +95,11 @@ export class Executor extends BaseInitiallyObject {
 
     await action.init();
 
-    if (!isStepComplete && !action.isPersistAction()) {
+    if (!isStepComplete) {
       await action.doAction();
     }
 
-    if (isStepComplete && action.isPersistAction()) {
+    if (action.isPersistAction()) {
       await action.doPersistAction();
       await this.stepExecutionReporter.completeStep(actionName);
     }

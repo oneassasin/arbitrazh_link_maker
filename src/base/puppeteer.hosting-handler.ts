@@ -12,20 +12,10 @@ export abstract class PuppeteerHostingHandler extends FtpHostingHandler {
 
     const url = this.getUrl();
 
-    const { browser, page } = await PuppeteerUtil.makeNewInstance(domain, url);
-
-    let puppeteerObject = this.storage.get(STORAGE_KEYS.PUPPETEER_STORAGE_KEY);
-    if (!puppeteerObject) {
-      puppeteerObject = {};
-    }
-
-    puppeteerObject[url] = { browser, page };
-    this.storage.set(STORAGE_KEYS.PUPPETEER_STORAGE_KEY, puppeteerObject);
+    const { browser, page } = await PuppeteerUtil.makeNewInstance(this.storage, domain, url);
 
     this.browser = browser;
     this.page = page;
-
-    await super.init();
   }
 
   protected abstract getUrl(): string;
