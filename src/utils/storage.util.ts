@@ -16,22 +16,22 @@ export class StorageUtil {
 
     const argv = yargs(process.argv.slice(2))
       .options({
-        random_domain: { type: 'boolean', default: false },
+        random_domain: { alias: ['random-domain'], type: 'boolean', default: false },
         domain: { type: 'string', default: '' },
-        need_domain_registration: { type: 'boolean', default: true },
+        disable_domain_register: { alias: ['disable-domain-register'], type: 'boolean', default: false },
 
         language: { type: 'string', choices: WHITE_PAGE_LANGUAGE_CHOICES, default: WHITE_PAGE_LANGUAGE_CHOICES[0] },
         thematic: { type: 'string', choices: WHITE_PAGE_THEMATIC_CHOICES, default: WHITE_PAGE_THEMATIC_CHOICES[0] },
 
         hosting: { choices: ['beget', 'jino', 'digitalocean'], default: 'jino' },
-        domain_register: { type: 'string', choices: ['beget', 'jino', 'namecheap'], default: 'jino' },
+        domain_register: { alias: ['domain-register'], type: 'string', choices: ['beget', 'jino', 'namecheap'], default: 'jino' },
 
         cloak: { choices: ['hideclick'], default: 'hideclick' },
 
         ip: { type: 'string', demandOption: false },
 
-        black_page_path: { type: 'string', demandOption: true, coerce: str => path.resolve(str) },
-        white_page_path: { type: 'string', demandOption: false, coerce: str => path.resolve(str) }
+        black_page_path: { alias: ['black-page-path'], type: 'string', demandOption: true, coerce: str => path.resolve(str) },
+        white_page_path: { alias: ['white-page-path'], type: 'string', demandOption: false, coerce: str => path.resolve(str) }
       })
       .argv;
 
@@ -45,7 +45,7 @@ export class StorageUtil {
 
     storage.set(STORAGE_KEYS.IP_KEY, argv.ip);
 
-    storage.set(STORAGE_KEYS.IS_NEED_TO_REGISTER_DOMAIN_KEY, argv.need_domain_registration);
+    storage.set(STORAGE_KEYS.IS_NEED_TO_REGISTER_DOMAIN_KEY, argv.disable_domain_register !== true);
 
     storage.set(STORAGE_KEYS.DOMAIN_REGISTER, argv.domain_register);
 
