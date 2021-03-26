@@ -32,15 +32,19 @@ async function main() {
     [],
   );
 
-  await executor.init();
+  try {
+    await executor.init();
 
-  const domain: string = storage.get(STORAGE_KEYS.DOMAIN_KEY);
+    const domain: string = storage.get(STORAGE_KEYS.DOMAIN_KEY);
 
-  // TODO: Каждая созданная ссылка (например, для домена или преленда) должна сохранять в какой-то массив в storage информацию в порядке создания
-  // По окончанию создания ссылки сделать вывод в консоль последней ссылки
-  console.log(`Link: https://${domain}/index.php`);
-
-  process.exit();
+    // TODO: Каждая созданная ссылка (например, для домена или преленда) должна сохранять в какой-то массив в storage информацию в порядке создания
+    // По окончанию создания ссылки сделать вывод в консоль последней ссылки
+    console.log(`Link: https://${domain}/index.php`);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    process.exit();
+  }
 }
 
 main().catch(console.error);

@@ -6,7 +6,10 @@ export class FtpUtil {
   static async makeNewInstance(storage: Map<string, any>, accessOptions: ConnectOptions): Promise<Client> {
     const client = new Client();
 
-    accessOptions.retries = 5000;
+    accessOptions.retries = 5;
+    accessOptions.debug = (msg: string) => {
+      console.debug(msg);
+    };
 
     await client.connect(accessOptions);
 

@@ -3,8 +3,9 @@ import config from '../config';
 import { URLS } from '../constants/urls.constants';
 import { STORAGE_KEYS } from '../constants/storage-keys.constants';
 import { ConnectOptions } from 'ssh2-sftp-client';
+import { FtpHostingHandler } from '../base/ftp.hosting-handler';
 
-export class BegetHostingHandler extends PuppeteerHostingHandler {
+export class BegetHostingHandler extends FtpHostingHandler {
   protected getUrl(): string {
     return URLS.BEGET_URL;
   }

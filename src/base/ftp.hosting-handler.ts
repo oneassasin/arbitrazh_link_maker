@@ -13,7 +13,11 @@ export abstract class FtpHostingHandler extends BaseHostingHandler {
 
   async uploadFile(destinationUrl: string, fileItemStructure: FileItemStructure) {
     if (!this.ftpClient) {
-      await this.ftpInit();
+      try {
+        await this.ftpInit();
+      } catch (err) {
+        console.error(err);
+      }
     }
 
     let readable: Readable | string | Buffer;
