@@ -53,6 +53,8 @@ export class GenerateHideClickPhpFileAction extends HttpAction {
       },
     );
 
+    // TODO: Add checking for API token
+
     const basePath = PuppeteerUtil.getLinkToDownloadsFolder(domain, this.getUrl());
     await FsUtil.saveBufferToPath(`${basePath}/index.php`, response.data);
   }

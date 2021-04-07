@@ -32,13 +32,15 @@ export class Executor extends BaseInitiallyObject {
       await this.handleAction(action);
     }
 
-    await this.domainRegister.init();
-
-    await this.hostingHandler.init();
-
     const isNeedToRegisterDomain = this.storage.get(STORAGE_KEYS.IS_NEED_TO_REGISTER_DOMAIN_KEY);
     const isNeedToRegisterDomainStepComplete =
       await this.stepExecutionReporter.isStepCompleted(REGISTER_DOMAIN_STEP_NAME);
+
+    if (isNeedToRegisterDomain && !isNeedToRegisterDomainStepComplete) {
+      await this.domainRegister.init();
+    }
+
+    await this.hostingHandler.init();
 
     if (isNeedToRegisterDomain && !isNeedToRegisterDomainStepComplete) {
       await this.domainRegister.registerDomain();

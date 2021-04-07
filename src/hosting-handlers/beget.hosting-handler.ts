@@ -1,4 +1,3 @@
-import { PuppeteerHostingHandler } from '../base/puppeteer.hosting-handler';
 import config from '../config';
 import { URLS } from '../constants/urls.constants';
 import { STORAGE_KEYS } from '../constants/storage-keys.constants';
@@ -29,7 +28,7 @@ export class BegetHostingHandler extends FtpHostingHandler {
       host: `${config.BEGET_USER}.beget.tech`,
       username: config.BEGET_USER,
       password: config.BEGET_PASSWORD,
-      port: 21,
+      port: 22,
     };
   }
 }
