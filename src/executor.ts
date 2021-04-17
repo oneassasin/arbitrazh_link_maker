@@ -8,6 +8,7 @@ import { FsUtil } from './utils/fs.util';
 import { BaseAction } from './base/base.action';
 import { BaseDomainRegister } from './base/base.domain-register';
 import { BaseHostingHandler } from './base/base.hosting-handler';
+import { LoggerUtil } from './utils/logger.util';
 
 const REGISTER_DOMAIN_STEP_NAME = 'register_domain';
 const DEFAULT_FILES_KEY = 'files';
@@ -24,6 +25,7 @@ export class Executor extends BaseInitiallyObject {
   }
 
   async init() {
+    LoggerUtil.log('*', 'Executor: init');
     await this.stepExecutionReporter.init();
 
     await this.handleActionsAsSteps(this.actions);
@@ -37,12 +39,17 @@ export class Executor extends BaseInitiallyObject {
       await this.stepExecutionReporter.isStepCompleted(REGISTER_DOMAIN_STEP_NAME);
 
     if (isNeedToRegisterDomain && !isNeedToRegisterDomainStepComplete) {
+      LoggerUtil.log('*', `Domain register: ${this.storage.get(STORAGE_KEYS.DOMAIN_REGISTER)}`);
+      LoggerUtil.log('*', 'Domain register: init');
       await this.domainRegister.init();
     }
 
+    LoggerUtil.log('*', `Hosting handler: ${this.storage.get(STORAGE_KEYS.HOSTING_KEY)}`);
+    LoggerUtil.log('*', 'Hosting handler: init');
     await this.hostingHandler.init();
 
     if (isNeedToRegisterDomain && !isNeedToRegisterDomainStepComplete) {
+      LoggerUtil.log('*', 'Hosting handler: register domain');
       await this.domainRegister.registerDomain();
 
       const domainRegisterName = this.storage.get(STORAGE_KEYS.DOMAIN_REGISTER);
@@ -50,6 +57,7 @@ export class Executor extends BaseInitiallyObject {
 
       if (domainRegisterName !== hostingHandlerName) {
         const dnsServers = await this.hostingHandler.getDnsServers();
+        LoggerUtil.log('*', 'Hosting handler: setup dns servers');
         await this.domainRegister.setupDnsServers(dnsServers);
       }
     }
@@ -66,6 +74,8 @@ export class Executor extends BaseInitiallyObject {
       const fileItemStructures: FileItemStructure[] = this.getFileStructuresFromFilesObject(filesObject, uploadFile.url);
       const fileItemStructure = fileItemStructures.find(value => value.name === uploadFile.fileName);
 
+      LoggerUtil.log('*', `Hosting handler: upload ${fileItemStructure.name} to ${destinationPath}`);
+
       await this.hostingHandler.uploadFile(destinationPath, fileItemStructure);
     }
 
@@ -74,6 +84,8 @@ export class Executor extends BaseInitiallyObject {
     for (const action of this.afterCompleteActions) {
       await this.handleAction(action);
     }
+
+    LoggerUtil.log('*', 'Executor: cleaning');
 
     await this.clearFolders();
 
@@ -98,10 +110,14 @@ export class Executor extends BaseInitiallyObject {
     await action.init();
 
     if (!isStepComplete) {
+      LoggerUtil.log('*', `${actionName}: Execute action`);
+
       await action.doAction();
     }
 
     if (action.isPersistAction()) {
+      LoggerUtil.log('*', `${actionName}: Execute persist action`);
+
       await action.doPersistAction();
       await this.stepExecutionReporter.completeStep(actionName);
     }

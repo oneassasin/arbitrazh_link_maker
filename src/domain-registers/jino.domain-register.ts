@@ -8,13 +8,14 @@ export class JinoDomainRegister extends PuppeteerDomainRegister {
     return URLS.JINO_URL;
   }
 
-  protected async onInit() {
+  async init() {
+    await super.init();
     await this.page.type('input[name="login"]', config.JINO_USER);
     await this.page.type('input[name="password"]', config.JINO_PASSWORD);
 
     await this.page.click('#authpage > div.authpage-formwrapper-login > form > div.form-row.form-controls > button');
 
-    await this.page.waitForResponse(URLS.JINO_URL);
+    await this.page.waitForTimeout(2500);
   }
 
   async registerDomain() {

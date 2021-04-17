@@ -1,7 +1,8 @@
 import config from '../config';
 import { STORAGE_KEYS } from '../constants/storage-keys.constants';
 import { FtpHostingHandler } from '../base/ftp.hosting-handler';
-import { ConnectOptions } from 'ssh2-sftp-client';
+import { FtpClientAccessOptionsStructure } from '../structures/ftp-client-access-options.structure';
+import { EUsedClient } from '../structures/used-ftp-client.enum';
 
 export class JinoHostingHandler extends FtpHostingHandler {
   formatDestinationPathForDomain(): string {
@@ -18,12 +19,16 @@ export class JinoHostingHandler extends FtpHostingHandler {
     ];
   }
 
-  protected async getFtpAccessOptions(): Promise<ConnectOptions> {
+  protected async getFtpAccessOptions(): Promise<FtpClientAccessOptionsStructure> {
     return {
       host: `${config.JINO_USER}.myjino.ru`,
       username: config.JINO_USER,
       password: config.JINO_PASSWORD,
       port: 21,
     };
+  }
+
+  protected getUsedFtpClient(): EUsedClient {
+    return EUsedClient.FTP;
   }
 }

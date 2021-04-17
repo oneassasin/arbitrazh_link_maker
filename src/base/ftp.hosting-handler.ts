@@ -3,10 +3,14 @@ import { FtpUtil } from '../utils/ftp.util';
 import { Readable } from 'stream';
 import { EFileItemType, FileItemStructure } from '../structures/file-item.structure';
 import * as AdmZip from 'adm-zip';
-import Client, { ConnectOptions, FileInfo } from 'ssh2-sftp-client';
+import { FtpClientAccessOptionsStructure } from '../structures/ftp-client-access-options.structure';
+import { FtpClientStructure } from '../structures/ftp-client.structure';
+import { FtpFileInfoStructure } from '../structures/ftp-file-info.structure';
+import { Buffer } from 'buffer';
+import { EUsedClient } from '../structures/used-ftp-client.enum';
 
 export abstract class FtpHostingHandler extends BaseHostingHandler {
-  protected ftpClient: Client;
+  protected ftpClient: FtpClientStructure;
 
   async init() {
   }
@@ -16,7 +20,7 @@ export abstract class FtpHostingHandler extends BaseHostingHandler {
       await this.ftpInit();
     }
 
-    let readable: Readable | string | Buffer;
+    let readable: Readable | Buffer | string;
 
     switch (fileItemStructure.type) {
       case EFileItemType.Zip: {
@@ -79,11 +83,12 @@ export abstract class FtpHostingHandler extends BaseHostingHandler {
 
   private async ftpInit() {
     const accessOptions = await this.getFtpAccessOptions();
+    const usedClient = this.getUsedFtpClient();
 
-    this.ftpClient = await FtpUtil.makeNewInstance(this.storage, accessOptions);
+    this.ftpClient = await FtpUtil.makeNewInstance(this.storage, accessOptions, usedClient);
 
     if (this.isNeedToClearDomainFolder()) {
-      const filesList: FileInfo[] = await this.ftpClient.list(this.formatDestinationPathForDomain());
+      const filesList: FtpFileInfoStructure[] = await this.ftpClient.list(this.formatDestinationPathForDomain());
       for (const file of filesList) {
         try {
           await this.ftpClient.rmdir(`${this.formatDestinationPathForDomain()}/${file.name}`, true);
@@ -103,5 +108,7 @@ export abstract class FtpHostingHandler extends BaseHostingHandler {
     return true;
   }
 
-  protected abstract async getFtpAccessOptions(): Promise<ConnectOptions>;
+  protected abstract async getFtpAccessOptions(): Promise<FtpClientAccessOptionsStructure>;
+
+  protected abstract getUsedFtpClient(): EUsedClient;
 }

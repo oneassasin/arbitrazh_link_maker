@@ -1,7 +1,8 @@
 import { URLS } from '../constants/urls.constants';
 import { STORAGE_KEYS } from '../constants/storage-keys.constants';
 import { HttpHostingHandler } from '../base/http.hosting-handler';
-import { ConnectOptions } from 'ssh2-sftp-client';
+import { EUsedClient } from '../structures/used-ftp-client.enum';
+import { FtpClientAccessOptionsStructure } from '../structures/ftp-client-access-options.structure';
 
 export class DigitalOceanHostingHandler extends HttpHostingHandler {
   private dropletIp: string = null;
@@ -48,7 +49,7 @@ export class DigitalOceanHostingHandler extends HttpHostingHandler {
     });
   }
 
-  protected async getFtpAccessOptions(): Promise<ConnectOptions> {
+  protected async getFtpAccessOptions(): Promise<FtpClientAccessOptionsStructure> {
     const ip = this.storage.get(STORAGE_KEYS.IP_KEY);
 
     const domain = this.storage.get(STORAGE_KEYS.DOMAIN_KEY);
@@ -68,5 +69,9 @@ export class DigitalOceanHostingHandler extends HttpHostingHandler {
       password: 'ab7d85314f9a7df83f6e0cb02884269d17a88f8ede74d386',
       port: 22,
     };
+  }
+
+  protected getUsedFtpClient(): EUsedClient {
+    return EUsedClient.SSH;
   }
 }
