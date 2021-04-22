@@ -9,6 +9,7 @@ import { BaseAction } from './base/base.action';
 import { BaseDomainRegister } from './base/base.domain-register';
 import { BaseHostingHandler } from './base/base.hosting-handler';
 import { LoggerUtil } from './utils/logger.util';
+import { UploadFileStructure } from './structures/upload-file.structure';
 
 const REGISTER_DOMAIN_STEP_NAME = 'register_domain';
 const DEFAULT_FILES_KEY = 'files';
@@ -19,9 +20,10 @@ export class Executor extends BaseInitiallyObject {
               private stepExecutionReporter: BaseStepExecutionReporter,
               private domainRegister: BaseDomainRegister,
               private hostingHandler: BaseHostingHandler,
-              private uploadFiles: { url?: string; optionalUrl?: boolean, fileName: string, }[],
+              uploadFiles: UploadFileStructure[],
               private afterCompleteActions: BaseAction[] = []) {
     super();
+    this.storage.set(STORAGE_KEYS.UPLOAD_FILES_KEY, uploadFiles);
   }
 
   async init() {
@@ -64,11 +66,12 @@ export class Executor extends BaseInitiallyObject {
 
     const filesObject = this.storage.get(STORAGE_KEYS.FILES_KEY);
 
-    for (const uploadFile of this.uploadFiles) {
+    const uploadFiles: UploadFileStructure[] = this.storage.get(STORAGE_KEYS.UPLOAD_FILES_KEY);
+    for (const uploadFile of uploadFiles) {
       let destinationPath = this.hostingHandler.formatDestinationPathForDomain();
 
-      if (uploadFile.fileName.includes('black')) {
-        destinationPath += '/__page__';
+      if (uploadFile.fileDestinationPath) {
+        destinationPath += `/${uploadFile.fileDestinationPath}`;
       }
 
       const fileItemStructures: FileItemStructure[] = this.getFileStructuresFromFilesObject(filesObject, uploadFile.url);

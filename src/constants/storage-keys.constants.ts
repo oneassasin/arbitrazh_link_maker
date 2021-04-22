@@ -1,4 +1,6 @@
 export const STORAGE_KEYS = {
+  UPLOAD_FILES_KEY: '__upload_files',
+
   PUPPETEER_STORAGE_KEY: '__puppeteer',
   HTTP_STORAGE_KEY: '__http',
   FILES_KEY: '__files',

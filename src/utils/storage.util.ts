@@ -1,6 +1,7 @@
 import * as yargs from 'yargs';
 import * as path from 'path';
 import { STORAGE_KEYS } from '../constants/storage-keys.constants';
+import { StringsUtil } from './strings.util';
 
 const WHITE_PAGE_LANGUAGE_CHOICES = [
   'ru', 'en', 'ga', 'it', 'de', 'bg', 'hu', 'es', 'pt', 'el', 'da', 'lv', 'lt', 'mt', 'nl', 'pl', 'ro', 'sk', 'sl', 'fi', 'fr', 'hr', 'cs', 'sv', 'et', 'id', 'kk', 'sq', 'vi', 'ja', 'zh', 'th', 'ko', 'ar'
@@ -36,7 +37,7 @@ export class StorageUtil {
       .argv;
 
     if (argv.random_domain) {
-      storage.set(STORAGE_KEYS.DOMAIN_KEY, `${this.generateRandomDomain()}.com`);
+      storage.set(STORAGE_KEYS.DOMAIN_KEY, `${StringsUtil.generateRandomString()}.com`);
     } else if (argv.domain) {
       storage.set(STORAGE_KEYS.DOMAIN_KEY, argv.domain);
     } else {
@@ -61,17 +62,5 @@ export class StorageUtil {
     }
 
     return storage;
-  }
-
-  private static generateRandomDomain(length: number = 12): string {
-    let result = '';
-    const characters = 'abcdefghijklmnopqrstuvwxyz';
-    const charactersLength = characters.length;
-
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-
-    return result;
   }
 }
