@@ -1,9 +1,12 @@
 # Arbitrazh Link Maker
 Скрипт для автоматического создания ссылок
 
-# ДОКУМЕНТАЦИЯ ВРЕМЕННО НЕАКТУАЛЬНА, ОБНОВЛЕНИЕ В БЛИЖАЙШЕЕ ВРЕМЯ
+### ВАЖНО
+Перед запуском скрипта на аккаунте в beget/jino необходимо ОДИН РАЗ создать руками домен
 
-## Что делает
+Это нужно для того, чтобы сохранить данные необходимые для регистрации домена (фамилия/имя/адрес/прочее) и скрипт потом их переиспользовал
+
+## Что делает скрипт
 * Удаляет все содержимое папки домена на хостинге
 * Регистрирует случайный (или с заданным именем) домен на выбранном поддерживаемом хостинге
   #### МОЖНО ОТКЛЮЧИТЬ ЧЕРЕЗ ОТДЕЛЬНЫЙ ПАРАМЕТР, ЧТОБЫ ВЫГРУЗИТЬ НА УЖЕ ЗАРЕГИСТРИРОВАННЫЙ ДОМЕН
@@ -18,15 +21,19 @@
   #### ВАЖНО: Чтобы файл клоаки не перезаписался файлом index.php от white page - index файл от white page должен иметь название index.html 
   #### ДРУГИМИ СЛОВАМИ - ПРОСТО ПЕРЕИМЕНУЙТЕ index.php в white page архиве в index.html
 
-## Поддерживаемые хостинги (на данный момент)
+## Поддерживаемые хостинги (расширяется)
 * Jino
 * Beget
 
-## Поддерживаемые клоаки (на данный момент)
+## Поддерживаемые клоаки (расширяется)
 * HideClick
+* IMKLO (скоро)
+* Keitaro (скоро)
+
+Если необходимы какие-то дополнительные интеграции - писать [автору](https://t.me/b_b_ing) в личку в телеграмме
 
 ## Как установить
-* Устанавливаем [Nodejs](https://nodejs.org/) под свою платформу 
+* Устанавливаем [Nodejs](https://nodejs.org/) под свою платформу. Версия 12.14
 * Скачиваем архив с последней версией данного скрипта [(ссылка)](https://github.com/oneassasin/arbitrazh_link_maker/archive/master.zip) и куда-нибудь распаковываем на компьютере
 * Переходим в папку с распакованным скриптом и выполняем команду ```npm install```
 * Далее, переходим в папку src и в файле `config.ts` в поля `JINO_USER/JINO_PASSWORD`, `BEGET_USER/BEGET_PASSWORD`, `HIDE_CLICK_TOKEN` - заполняем свои данные от учетных записей
@@ -35,19 +42,19 @@
 
 ## Как использовать
 ##### Отключение регистрации домена, выгрузка архивов white page и black page с компьютера на домен apqrtlyd.ru, хостинг jino
-```npm start -- --register_domain=false --domain=apqrtlyd.ru --black_page_path=ПУТЬ_К_ZIP_АРХИВУ --white_page_path=ПУТЬ_К_ZIP_АРХИВУ```
+```npm start -- --disable_register_domain --hosting=jino --domain=apqrtlyd.ru --black_page_path=ПУТЬ_К_ZIP_АРХИВУ --white_page_path=ПУТЬ_К_ZIP_АРХИВУ```
 
 ##### Отключение регистрации домена, хостинг beget, выгрузка архивов white page и black page с компьютера на домен apqrtlyd.ru, хостинг jino
-```npm start -- --register_domain=false --domain=apqrtlyd.ru --hosting=beget --black_page_path=ПУТЬ_К_ZIP_АРХИВУ --white_page_path=ПУТЬ_К_ZIP_АРХИВУ```
+```npm start -- --disable_register_domain --hosting=beget --domain=apqrtlyd.ru --hosting=beget --black_page_path=ПУТЬ_К_ZIP_АРХИВУ --white_page_path=ПУТЬ_К_ZIP_АРХИВУ```
 
 ##### Регистрация случайного домена на jino, выгрузка white page и black page на этот домен
-```npm start -- --black_page_path=ПУТЬ_К_ZIP_АРХИВУ --white_page_path=ПУТЬ_К_ZIP_АРХИВУ```
+```npm start -- --random-domain --domain_register=jino --hosting=jino --black_page_path=ПУТЬ_К_ZIP_АРХИВУ --white_page_path=ПУТЬ_К_ZIP_АРХИВУ```
 
 ##### Регистрация случайного домена в зоне `.com` на jino, генерация white page на https://pl.ad-red.ru/ c тематикой #5 и языком #3, black page с zip архива на компьютере 
-```npm start -- --black_page_path=ПУТЬ_К_ZIP_АРХИВУ --language=3 --thematic=5```
+```npm start -- --random-domain --domain_register=jino --hosting=jino --black_page_path=ПУТЬ_К_ZIP_АРХИВУ --language=3 --thematic=5```
 
 ##### Регистрация случайного домена в зоне `.com` на beget, генерация white page на https://pl.ad-red.ru/, black page с zip архива на компьютере
-```npm start -- --black_page_path=ПУТЬ_К_ZIP_АРХИВУ --hosting=beget```
+```npm start -- --random-domain --domain_register=jino --hosting=jino --black_page_path=ПУТЬ_К_ZIP_АРХИВУ```
 
 ##### Помощь в использовании скрипта
 ```npm start help```
