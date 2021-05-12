@@ -10,9 +10,9 @@ import { BaseDomainRegister } from './base/base.domain-register';
 import { BaseHostingHandler } from './base/base.hosting-handler';
 import { LoggerUtil } from './utils/logger.util';
 import { UploadFileStructure } from './structures/upload-file.structure';
+import { StorageUtil } from './utils/storage.util';
 
 const REGISTER_DOMAIN_STEP_NAME = 'register_domain';
-const DEFAULT_FILES_KEY = 'files';
 
 export class Executor extends BaseInitiallyObject {
   constructor(private storage: Map<string, any>,
@@ -74,7 +74,7 @@ export class Executor extends BaseInitiallyObject {
         destinationPath += `/${uploadFile.fileDestinationPath}`;
       }
 
-      const fileItemStructures: FileItemStructure[] = this.getFileStructuresFromFilesObject(filesObject, uploadFile.url);
+      const fileItemStructures: FileItemStructure[] = StorageUtil.getFileStructuresFromFilesObject(filesObject, uploadFile.url);
       const fileItemStructure = fileItemStructures.find(value => value.name === uploadFile.fileName);
 
       LoggerUtil.log('*', `Hosting handler: upload ${fileItemStructure.name} to ${destinationPath}`);
@@ -95,15 +95,6 @@ export class Executor extends BaseInitiallyObject {
     await this.stepExecutionReporter.clearData();
 
     await this.clearPuppeteerInstances();
-  }
-
-  private getFileStructuresFromFilesObject(filesObject: any, keyString: string): Array<FileItemStructure> {
-    const keys = [keyString, DEFAULT_FILES_KEY].filter(key => !!filesObject[key]);
-    if (!keys.length) {
-      return;
-    }
-
-    return filesObject[keys[0]];
   }
 
   private async handleAction(action: BaseAction) {

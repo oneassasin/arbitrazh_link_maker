@@ -38,7 +38,7 @@ async function main() {
     [
       { fileName: 'black.zip', fileDestinationPath: '__page__' },
       { url: URLS.PL_AD_RED_URL, fileName: 'white.zip' },
-      { url: URLS.HIDE_CLICK_URL, fileName: 'index.php' },
+      { fileName: 'index.php' },
     ],
     [],
   );

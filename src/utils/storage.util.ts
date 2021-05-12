@@ -2,6 +2,7 @@ import * as yargs from 'yargs';
 import * as path from 'path';
 import { STORAGE_KEYS } from '../constants/storage-keys.constants';
 import { StringsUtil } from './strings.util';
+import { FileItemStructure } from '../structures/file-item.structure';
 
 const WHITE_PAGE_LANGUAGE_CHOICES = [
   'ru', 'en', 'ga', 'it', 'de', 'bg', 'hu', 'es', 'pt', 'el', 'da', 'lv', 'lt', 'mt', 'nl', 'pl', 'ro', 'sk', 'sl', 'fi', 'fr', 'hr', 'cs', 'sv', 'et', 'id', 'kk', 'sq', 'vi', 'ja', 'zh', 'th', 'ko', 'ar'
@@ -10,6 +11,8 @@ const WHITE_PAGE_LANGUAGE_CHOICES = [
 const WHITE_PAGE_THEMATIC_CHOICES = [
   'oil_ai', 'psychology_ai', 'health_and_beauty_ai', 'gifts_ai', 'varicose_ai', 'mans_health_ai', 'marketing_ai', 'fitnes_ai', 'finance_ai', 'aligadgety_ai', 'apartment_ai', 'geology_ai', 'joints_ai', 'agrobiologia_ai'
 ];
+
+const DEFAULT_FILES_KEY = 'files';
 
 export class StorageUtil {
   static parseArgsToStorage(): Map<string, any> {
@@ -27,7 +30,7 @@ export class StorageUtil {
         hosting: { choices: ['beget', 'jino', 'digitalocean'], default: 'jino' },
         domain_register: { alias: ['domain-register'], type: 'string', choices: ['beget', 'jino', 'namecheap'], default: 'jino' },
 
-        cloak: { choices: ['hideclick'], default: 'hideclick' },
+        cloak: { choices: ['hideclick', 'keitaro-php', 'keitaro-js'], default: 'hideclick' },
 
         ip: { type: 'string', demandOption: false },
 
@@ -62,5 +65,14 @@ export class StorageUtil {
     }
 
     return storage;
+  }
+
+  static getFileStructuresFromFilesObject(filesObject: any, keyString: string): Array<FileItemStructure> {
+    const keys = [keyString, DEFAULT_FILES_KEY].filter(key => !!filesObject[key]);
+    if (!keys.length) {
+      return;
+    }
+
+    return filesObject[keys[0]];
   }
 }

@@ -27,7 +27,11 @@ export class BegetDomainRegister extends PuppeteerDomainRegister {
 
     await this.page.type('#fqdn', domain);
 
+    await this.page.waitForTimeout(1000);
+
     await this.page.click(`div[title="${domain}"]`);
+
+    await this.page.waitForTimeout(1000);
 
     await this.page.click('button[st="button-domains-register-name"]');
 

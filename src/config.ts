@@ -18,6 +18,9 @@ interface IConfig {
 
   HIDE_CLICK_TOKEN: string;
 
+  KEITARO_API_URL: string;
+  KEITARO_API_TOKEN: string;
+
   IS_HEADLESS_CHROME: boolean;
 }
 
@@ -39,6 +42,9 @@ const config = {
     DIGITALOCEAN_TOKEN: '',
 
     HIDE_CLICK_TOKEN: '',
+
+    KEITARO_API_TOKEN: '',
+    KEITARO_API_URL: '',
   },
   GLOBAL: {
     IS_HEADLESS_CHROME: false,

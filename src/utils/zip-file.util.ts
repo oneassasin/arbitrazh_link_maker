@@ -6,16 +6,28 @@ export class ZipFileUtil {
   static async convertWhitePageZipArchive(buffer: Buffer): Promise<Buffer> {
     const archive = new AdmZip(buffer);
 
+    const indexFileEntry = archive
+      .getEntries()
+      .find(entry => entry.name === 'index.php' || entry.name === 'index.html');
+
+    let replaceEntryPathText: string;
+    if (indexFileEntry) {
+      const fileExtension = indexFileEntry.name.split('.')[1];
+      replaceEntryPathText = indexFileEntry.entryName.split(`index.${fileExtension}`)[0];
+    } else {
+      replaceEntryPathText = 'html/';
+    }
+
     const newArchive = new AdmZip();
 
     for (const entry of archive.getEntries()) {
       const name = entry.entryName;
 
-      if (name.startsWith('php/') || name === 'html/') {
+      if (name.endsWith('/')) {
         continue;
       }
 
-      const result = name.replace('html/', '');
+      const result = name.replace(replaceEntryPathText, '');
 
       await this.handleEntity(result, entry, newArchive);
     }
