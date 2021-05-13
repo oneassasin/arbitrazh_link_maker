@@ -45,7 +45,7 @@ export class FtpClientStructure {
 
   async put(readable: Readable | Buffer | string, path: string) {
     if (this.usedClient === EUsedClient.SSH) {
-      await this.sshClient.put(Buffer.from(readable), path);
+      await this.sshClient.put(Buffer.from(readable as any), path);
     }
     if (this.usedClient === EUsedClient.FTP) {
       let uploadReadable: string = null;

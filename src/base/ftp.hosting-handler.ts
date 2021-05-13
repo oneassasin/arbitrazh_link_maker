@@ -69,11 +69,11 @@ export abstract class FtpHostingHandler extends BaseHostingHandler {
         return;
       }
       case EFileItemType.Buffer: {
-        readable = Buffer.from(fileItemStructure.value);
+        readable = Buffer.from(fileItemStructure.value as Buffer);
         break;
       }
       case EFileItemType.String: {
-        readable = Buffer.from(fileItemStructure.value);
+        readable = Buffer.from(fileItemStructure.value as string);
         break;
       }
     }
