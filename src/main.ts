@@ -50,7 +50,7 @@ async function main() {
 
     // TODO: Каждая созданная ссылка (например, для домена или преленда) должна сохранять в какой-то массив в storage информацию в порядке создания
     // По окончанию создания ссылки сделать вывод в консоль последней ссылки
-    LoggerUtil.log('Main', `Link: https://${domain}/index.php`);
+    LoggerUtil.log('Main', `Link: https://${domain}/`);
   } catch (err) {
     LoggerUtil.log('Main', 'Link doesnt created');
     console.error(err);
