@@ -37,6 +37,10 @@ export abstract class FtpHostingHandler extends BaseHostingHandler {
 
           let remoteFilePath = destinationUrl;
 
+          if (entry.entryName.replace(/\s+/g, '').length === 0) {
+            continue;
+          }
+
           if (entry.entryName.split('/').length > 1) {
             const foldersArray = entry.entryName.split('/');
 
