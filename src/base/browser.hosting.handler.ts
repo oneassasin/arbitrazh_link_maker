@@ -1,9 +1,9 @@
 import { STORAGE_KEYS } from '../constants/storage-keys.constants';
-import { PuppeteerUtil } from '../utils/puppeteer.util';
-import { Browser, Page } from 'puppeteer';
-import { FileAction } from './file.action';
+import { FtpHostingHandler } from './ftp.hosting-handler';
+import { Browser, Page } from 'playwright';
+import { BrowserUtil } from '../utils/browser.util';
 
-export abstract class PuppeteerAction extends FileAction {
+export abstract class BrowserHostingHandler extends FtpHostingHandler {
   protected browser: Browser;
   protected page: Page;
 
@@ -12,12 +12,10 @@ export abstract class PuppeteerAction extends FileAction {
 
     const url = this.getUrl();
 
-    const { browser, page } = await PuppeteerUtil.makeNewInstance(this.storage, domain, url);
+    const { browser, page } = await BrowserUtil.makeNewInstance(this.storage, domain, url);
 
     this.browser = browser;
     this.page = page;
-
-    await super.init();
   }
 
   protected abstract getUrl(): string;

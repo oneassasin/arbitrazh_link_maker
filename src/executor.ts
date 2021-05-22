@@ -2,7 +2,6 @@ import { STORAGE_KEYS } from './constants/storage-keys.constants';
 import { FileItemStructure } from './structures/file-item.structure';
 import { BaseInitiallyObject } from './base/base.initially-object';
 import * as path from 'path';
-import { Browser, Page } from 'puppeteer';
 import { BaseStepExecutionReporter } from './base/base.step-execution-reporter';
 import { FsUtil } from './utils/fs.util';
 import { BaseAction } from './base/base.action';
@@ -11,6 +10,7 @@ import { BaseHostingHandler } from './base/base.hosting-handler';
 import { LoggerUtil } from './utils/logger.util';
 import { UploadFileStructure } from './structures/upload-file.structure';
 import { StorageUtil } from './utils/storage.util';
+import { Browser, Page } from 'playwright';
 
 const REGISTER_DOMAIN_STEP_NAME = 'register_domain';
 
@@ -94,7 +94,7 @@ export class Executor extends BaseInitiallyObject {
 
     await this.stepExecutionReporter.clearData();
 
-    await this.clearPuppeteerInstances();
+    await this.clearBrowserInstances();
   }
 
   private async handleAction(action: BaseAction) {
@@ -135,15 +135,15 @@ export class Executor extends BaseInitiallyObject {
     await FsUtil.removeFolder(`${path.join(process.cwd())}/Downloads/${domain}`);
   }
 
-  private async clearPuppeteerInstances() {
-    // Метод ЗАКРЫТИЯ всех puppeteer по окончанию создания ссылки, чтобы скрипт закрывался
-    const puppeteerObject = this.storage.get(STORAGE_KEYS.PUPPETEER_STORAGE_KEY);
-    if (!puppeteerObject) {
+  private async clearBrowserInstances() {
+    // Метод ЗАКРЫТИЯ всех браузеров по окончанию создания ссылки, чтобы скрипт закрывался
+    const browserObject = this.storage.get(STORAGE_KEYS.BROWSER_STORAGE_KEY);
+    if (!browserObject) {
       return;
     }
 
-    for (const url of Object.keys(puppeteerObject)) {
-      const browserStructure: { browser: Browser, page: Page } = puppeteerObject[url];
+    for (const url of Object.keys(browserObject)) {
+      const browserStructure: { browser: Browser, page: Page } = browserObject[url];
       try {
         await browserStructure.browser.close();
       } catch (err) {

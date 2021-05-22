@@ -1,9 +1,9 @@
 import { STORAGE_KEYS } from '../constants/storage-keys.constants';
 import { URLS } from '../constants/urls.constants';
-import { PuppeteerDomainRegister } from '../base/puppeteer.domain-register';
 import config from '../config';
+import { BrowserDomainRegister } from '../base/browser.domain-register';
 
-export class NamecheapDomainRegister extends PuppeteerDomainRegister {
+export class NamecheapDomainRegister extends BrowserDomainRegister {
   protected getUrl(): string {
     return URLS.NAMECHEAP_URL;
   }
@@ -13,14 +13,13 @@ export class NamecheapDomainRegister extends PuppeteerDomainRegister {
     await this.page.goto(`${URLS.NAMECHEAP_URL}myaccount/login/`);
     await this.page.waitForSelector(
       '#ctl00_ctl00_ctl00_ctl00_base_content_web_base_content_home_content_page_content_left_ctl02_loginDiv > ul > li > fieldset > div:nth-child(2) > input',
-      { timeout: 10000, visible: true },
     );
 
-    await this.page.type(
+    await this.page.fill(
       '#ctl00_ctl00_ctl00_ctl00_base_content_web_base_content_home_content_page_content_left_ctl02_loginDiv > ul > li > fieldset > div:nth-child(2) > input',
       config.NAMECHEAP_USER,
     );
-    await this.page.type(
+    await this.page.fill(
       '#ctl00_ctl00_ctl00_ctl00_base_content_web_base_content_home_content_page_content_left_ctl02_loginDiv > ul > li > fieldset > div:nth-child(3) > input',
       config.NAMECHEAP_PASSWORD,
     );
@@ -34,7 +33,7 @@ export class NamecheapDomainRegister extends PuppeteerDomainRegister {
     const domain = this.storage.get(STORAGE_KEYS.DOMAIN_KEY);
 
     // Ввод домена
-    await this.page.type('#maincontent > div > div:nth-child(5) > div > div > div:nth-child(2) > div > form > input', domain);
+    await this.page.fill('#maincontent > div > div:nth-child(5) > div > div > div:nth-child(2) > div > form > input', domain);
     // Клик на кнопку поиска
     await this.page.click('#react-nc-search > div > div:nth-child(1) > section > article > button');
 
@@ -61,14 +60,14 @@ export class NamecheapDomainRegister extends PuppeteerDomainRegister {
     const domain = this.storage.get(STORAGE_KEYS.DOMAIN_KEY);
 
     await this.page.goto(`https://ap.www.namecheap.com/domains/domaincontrolpanel/${domain}/domain`);
-    await this.page.waitForSelector('#EdidNameServerfrm > div.form.smaller.dashed-inputs > div.row.reset-margin.nameservers-row > div.columns.medium-3 > div > div > span.h-ribbon.grey', { visible: true });
+    await this.page.waitForSelector('#EdidNameServerfrm > div.form.smaller.dashed-inputs > div.row.reset-margin.nameservers-row > div.columns.medium-3 > div > div > span.h-ribbon.grey');
     await this.page.click('#EdidNameServerfrm > div.form.smaller.dashed-inputs > div.row.reset-margin.nameservers-row > div:nth-child(2) > div.columns.xsmall-9.small-5.medium-3.xlarge-3.xxlarge-3 > div > a');
     await this.page.click('#select2-results-9 > li.select2-results-dept-0.select2-result.select2-result-selectable.select2-highlighted > div');
 
     let index = 0;
     for (const dnsServer of dnsServers) {
       await this.page.click('#EdidNameServerfrm > div.form.smaller.dashed-inputs > div:nth-child(2) > div > div > p > a');
-      await this.page.type(`index${index}`, dnsServer);
+      await this.page.fill(`index${index}`, dnsServer);
     }
 
     await this.page.click('#EdidNameServerfrm > div.form.smaller.dashed-inputs > div.row.reset-margin.nameservers-row > div:nth-child(2) > div.columns.xsmall-3.medium-3.large-4.small-text-right.end > div > a.save');

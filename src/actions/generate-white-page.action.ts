@@ -1,10 +1,10 @@
 import { URLS } from '../constants/urls.constants';
 import { FsUtil } from '../utils/fs.util';
-import { PuppeteerUtil } from '../utils/puppeteer.util';
 import { STORAGE_KEYS } from '../constants/storage-keys.constants';
 import { HttpAction } from '../base/http.action';
 import config from '../config';
 import { ZipFileUtil } from '../utils/zip-file.util';
+import { BrowserUtil } from '../utils/browser.util';
 
 export class GenerateWhitePageAction extends HttpAction {
   protected getUrl(): string {
@@ -39,13 +39,13 @@ export class GenerateWhitePageAction extends HttpAction {
 
     const archiveData = downloadResponse.data;
 
-    const basePath = PuppeteerUtil.getLinkToDownloadsFolder(domain, this.getUrl());
+    const basePath = BrowserUtil.getLinkToDownloadsFolder(domain, this.getUrl());
     await FsUtil.saveBufferToPath(`${basePath}/${hash}.zip`, archiveData);
   }
 
   async doPersistAction() {
     const domain = this.storage.get(STORAGE_KEYS.DOMAIN_KEY);
-    const basePath = PuppeteerUtil.getLinkToDownloadsFolder(domain, this.getUrl());
+    const basePath = BrowserUtil.getLinkToDownloadsFolder(domain, this.getUrl());
 
     const fileNames = await FsUtil.findFilesByGlob(`${basePath}/*.zip`);
     const filePathName = fileNames[0];

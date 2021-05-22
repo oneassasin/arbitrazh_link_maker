@@ -2,10 +2,10 @@ import { URLS } from '../constants/urls.constants';
 import config from '../config';
 import { STORAGE_KEYS } from '../constants/storage-keys.constants';
 import { FsUtil } from '../utils/fs.util';
-import { PuppeteerUtil } from '../utils/puppeteer.util';
 import { HttpAction } from '../base/http.action';
 import { Cookie } from 'tough-cookie';
 import FormData = require('form-data');
+import { BrowserUtil } from '../utils/browser.util';
 
 export class GenerateHideClickPhpFileAction extends HttpAction {
   protected getUrl(): string {
@@ -55,13 +55,13 @@ export class GenerateHideClickPhpFileAction extends HttpAction {
 
     // TODO: Add checking for API token
 
-    const basePath = PuppeteerUtil.getLinkToDownloadsFolder(domain, this.getUrl());
+    const basePath = BrowserUtil.getLinkToDownloadsFolder(domain, this.getUrl());
     await FsUtil.saveBufferToPath(`${basePath}/index.php`, response.data);
   }
 
   async doPersistAction() {
     const domain = this.storage.get(STORAGE_KEYS.DOMAIN_KEY);
-    const basePath = PuppeteerUtil.getLinkToDownloadsFolder(domain, this.getUrl());
+    const basePath = BrowserUtil.getLinkToDownloadsFolder(domain, this.getUrl());
 
     const fileNames = await FsUtil.findFilesByGlob(`${basePath}/index.php`);
     const filePathName = fileNames[0];
